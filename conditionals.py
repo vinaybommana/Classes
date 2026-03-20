@@ -3,6 +3,9 @@ import math
 
 print(math.pi)
 
+# boolean value: true or false
+# True and False
+
 var = 2
 # if var < 1: # true or false (2 < 1)
 # if <conditional-check>:

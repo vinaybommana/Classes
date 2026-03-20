@@ -13,7 +13,7 @@ fruit = input("what are you eating today: ")
 # else:
 #     print(f"I don't know this: {fruit}")
 
-# match case
+# match case # switch case
 match fruit:
     case "apple":
         print(f"{fruit} is a good one")
