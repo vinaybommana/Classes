@@ -1,0 +1,4 @@
+
+Hello, World!
+Welcome to Python.
+File operations are fun!
