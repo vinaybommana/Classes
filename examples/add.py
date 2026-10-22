@@ -1,6 +1,8 @@
 import sys
 
-user_inputs = sys.argv[1:]
+from sys import argv
+
+user_inputs = argv[:1]
 
 sum = 0
 for i in user_inputs:

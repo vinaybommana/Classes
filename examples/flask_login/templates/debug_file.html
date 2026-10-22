@@ -1,0 +1,39 @@
+{#
+  A TEACHING PAGE — not something you would ever ship.
+
+  It prints the raw contents of users.txt so the class can SEE that the data
+  is real, on disk, and survives a restart. It is also the fastest way to make
+  the plain-text password problem land: there they are, readable.
+#}
+{% extends "base.html" %}
+
+{% block title %}users.txt{% endblock %}
+
+{% block content %}
+
+  <h1>Inside <code>{{ path }}</code></h1>
+
+  <p>
+    This is the actual file on disk, printed as-is. One line per user,
+    <code>username,password</code>.
+  </p>
+
+  {#
+    <pre> keeps the newlines and spacing exactly as they are in the file.
+    Without it, the browser would collapse every line into one paragraph,
+    because HTML treats all whitespace as a single space.
+  #}
+  <pre class="file-dump">{{ contents }}</pre>
+
+  <p class="error">
+    <strong>Look at those passwords.</strong> Anyone who can read this file —
+    or this page — has every account on the site. Real applications never
+    store a password; they store a one-way hash of it. See the README.
+  </p>
+
+  <p class="small">
+    Stop the server with <code>Ctrl+C</code>, start it again, and reload this
+    page. The file is still here. That is persistence.
+  </p>
+
+{% endblock %}

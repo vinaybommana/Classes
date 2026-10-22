@@ -1,0 +1,59 @@
+{#
+  THE BASE TEMPLATE
+  =================
+  Same idea as flask_templates/base.html — the skeleton written once, with
+  labelled holes that each page fills in.
+
+  The one new thing here is the nav bar. It changes depending on whether
+  somebody is logged in:
+
+      logged out  ->  Log in | Register
+      logged in   ->  Dashboard | Log out  (and their name)
+
+  How does a TEMPLATE know who is logged in? Because `session` is available
+  inside every template automatically — you don't pass it to
+  render_template(). Flask injects it, along with `request` and `url_for`.
+
+  So a template can ask the same question the Python does:
+
+      {% if session.username %}
+
+  Note `session.username` and not `session["username"]`. In Jinja the dot
+  form works on dictionaries too, and — this is the useful part — a missing
+  key renders as nothing instead of raising an error. That is exactly what we
+  want for an "are they logged in?" test.
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Flask Login Demo{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <nav>
+    {% if session.username %}
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('debug_users_file') }}">users.txt</a>
+      <span class="nav-right">
+        Signed in as <strong>{{ session.username }}</strong>
+        &middot; <a href="{{ url_for('logout') }}">Log out</a>
+      </span>
+    {% else %}
+      <a href="{{ url_for('login') }}">Log in</a>
+      <a href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>Built with Flask &middot; Python Classes</p>
+  </footer>
+
+</body>
+</html>

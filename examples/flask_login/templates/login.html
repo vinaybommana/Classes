@@ -1,0 +1,43 @@
+{#
+  THE LOGIN FORM
+  ==============
+  Nearly identical to register.html — which is the point. A login form is not
+  special. It is an ordinary POST form; all of the "login" happens in Python.
+#}
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+
+  {#
+    Shown after a successful signup. app.py redirected here with
+    ?registered=1, read it out of request.args, and passed registered=True.
+  #}
+  {% if registered %}
+    <p class="success">Account created. You can log in now.</p>
+  {% endif %}
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  <form class="card" action="{{ url_for('login') }}" method="POST">
+    <h2>Log in</h2>
+
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text"
+           value="{{ username }}" required autofocus>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required>
+
+    <button type="submit">Log in</button>
+
+    <p class="small">
+      No account yet?
+      <a href="{{ url_for('register') }}">Register</a>
+    </p>
+  </form>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+/* ============================================================
+   static/style.css
+   ============================================================
+   Files in `static/` are served as-is - Flask does not process them.
+   Templates are rendered; static files are just handed over unchanged.
+
+   CSS, images, and JavaScript all live here.
+
+   Linked from base.html with:
+       <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+   You can also open it directly: http://localhost:5000/static/style.css
+
+   This file is deliberately small - it is here to show WHERE styling goes,
+   not to teach CSS.
+   ============================================================ */
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  color: #222;
+}
+
+nav {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #0b5fff;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+code {
+  background: #f3f3f3;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background: #f7f7f7;
+}
+
+form {
+  margin: 1.5rem 0;
+}
+
+input, button {
+  font-size: 1rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.ok {
+  color: #0a7a3d;
+}
+
+.warn {
+  color: #b00020;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  font-size: 0.85rem;
+  color: #666;
+}

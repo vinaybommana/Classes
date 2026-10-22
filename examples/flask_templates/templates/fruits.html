@@ -1,0 +1,57 @@
+{#
+  A LOOP.
+
+  The route handed us `fruits` - a plain Python list of dictionaries. We write
+  the <tr> once and let the loop repeat it.
+
+  Four fruits in the list -> four rows on the page. Add a fifth in app.py and
+  this file does not change at all.
+#}
+{% extends "base.html" %}
+
+{% block title %}Fruits{% endblock %}
+
+{% block content %}
+  <h1>Fruits</h1>
+
+  <p>{{ fruits|length }} fruits in the list.</p>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Colour</th>
+      <th>Price</th>
+    </tr>
+
+    {% for fruit in fruits %}
+      <tr>
+        {# loop.index is a free counter Jinja gives you: 1, 2, 3...
+           (loop.index0 starts at 0 if you prefer.) #}
+        <td>{{ loop.index }}</td>
+
+        {# fruit is a dict, so fruit.name works - same as fruit["name"] #}
+        <td>{{ fruit.name }}</td>
+        <td>{{ fruit.color }}</td>
+        <td>&#8377;{{ fruit.price }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h2>The same data as a list</h2>
+
+  {#
+    A for-loop can have an else branch, which runs when the list is EMPTY.
+    Very handy - it saves writing a separate "if the list is empty" check.
+    Empty the list in app.py to see it fire.
+  #}
+  <ul>
+    {% for fruit in fruits %}
+      <li>{{ fruit.name }} — {{ fruit.color }}</li>
+    {% else %}
+      <li>No fruits today.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{{ url_for('home') }}">&larr; Back home</a></p>
+{% endblock %}

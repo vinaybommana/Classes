@@ -1,0 +1,30 @@
+{#
+  if / elif / else in a template.
+
+  Identical to Python except for the brackets and the explicit closing tag.
+  Indentation is only for human readability here - Jinja ignores it, which is
+  exactly why the closing tag has to be written out.
+#}
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }}{% endblock %}
+
+{% block content %}
+  <h1>{{ user.name }}</h1>
+
+  {% if user.active %}
+    <p class="ok">This account is active.</p>
+  {% else %}
+    <p class="warn">This account is deactivated.</p>
+  {% endif %}
+
+  {% if user.role == "admin" %}
+    <p>{{ user.name }} is an <strong>administrator</strong> and can do anything.</p>
+  {% elif user.role == "student" %}
+    <p>{{ user.name }} is a <strong>student</strong>.</p>
+  {% else %}
+    <p>Unknown role.</p>
+  {% endif %}
+
+  <p><a href="{{ url_for('user_list') }}">&larr; All users</a></p>
+{% endblock %}

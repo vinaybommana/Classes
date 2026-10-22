@@ -1,0 +1,36 @@
+{#
+  Looping over a DICTIONARY instead of a list.
+
+  `users` is {1: {...}, 2: {...}, 3: {...}}, so we use .items() exactly like
+  we would in Python:
+
+      for user_id, user in users.items():
+#}
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+  <h1>Users</h1>
+
+  <ul>
+    {% for user_id, user in users.items() %}
+      <li>
+        {# Passing user_id into url_for builds /users/1, /users/2, ... #}
+        <a href="{{ url_for('user_profile', user_id=user_id) }}">{{ user.name }}</a>
+
+        {# A one-line if, with no else needed #}
+        {% if not user.active %}
+          <em>(inactive)</em>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <p>
+    Try <a href="{{ url_for('user_profile', user_id=99) }}">/users/99</a> —
+    a user who doesn't exist.
+  </p>
+
+  <p><a href="{{ url_for('home') }}">&larr; Back home</a></p>
+{% endblock %}

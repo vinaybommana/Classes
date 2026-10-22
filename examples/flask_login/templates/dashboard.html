@@ -1,0 +1,54 @@
+{#
+  THE PROTECTED PAGE
+  ==================
+  There is nothing clever in this template. It just prints a name.
+
+  The protection is NOT here — it is the three lines at the top of the
+  dashboard() route in app.py. A template cannot keep anyone out; it only
+  runs once Python has already decided to render it.
+
+  Worth saying in class: hiding a link in the nav bar is not security either.
+  If the route has no guard, typing the URL gets you in.
+#}
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+  <h1>Hello, {{ username }}</h1>
+
+  <p>
+    You are logged in. This page is only reachable because
+    <code>session["username"]</code> exists.
+  </p>
+
+  <h2>Try this</h2>
+  <ol>
+    <li>
+      Click <a href="{{ url_for('logout') }}">Log out</a>, then type
+      <code>/dashboard</code> in the address bar. You get bounced to the login
+      page — that is the guard in <code>app.py</code> doing its job.
+    </li>
+    <li>
+      Log back in, then <strong>close the tab and reopen it</strong>. Still
+      logged in: the session cookie lives in the browser, not the page.
+    </li>
+    <li>
+      Open this site in a private/incognito window. Logged out — a different
+      browser profile means a different cookie jar.
+    </li>
+    <li>
+      Stop the server (<code>Ctrl+C</code>), start it again, and refresh.
+      Still logged in, and your account is still in
+      <a href="{{ url_for('debug_users_file') }}">users.txt</a> — two different
+      things surviving for two different reasons. The <em>account</em> survived
+      because we wrote it to a file. The <em>session</em> survived because the
+      cookie lives in your browser and <code>app.secret_key</code> is
+      hard-coded, so the restarted server can still verify it. Change that key
+      in <code>app.py</code>, restart, and you will be logged out instantly —
+      the old cookie no longer checks out.
+    </li>
+  </ol>
+
+{% endblock %}

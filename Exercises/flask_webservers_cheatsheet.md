@@ -433,7 +433,272 @@ return jsonify({"error": "Not found"}), 404
 
 ---
 
-## 9. A Complete Example — Todo API
+## 9. Templates — Returning HTML Pages
+
+Returning a string of HTML works, but a real page is far too long to live inside a Python function. So we split the two apart:
+
+```
+app.py        →  the LOGIC    (Python works out the data)
+templates/    →  the LAYOUT   (HTML decides how it looks)
+static/       →  CSS, images, JS  (served unchanged)
+```
+
+`render_template()` is the bridge.
+
+### The Folder Layout — Not Optional
+
+```
+my_app/
+├── app.py
+├── templates/          ← Flask looks here, by this exact name
+│   ├── base.html
+│   └── index.html
+└── static/             ← and here, by this exact name
+    └── style.css
+```
+
+You never configure these. `Flask(__name__)` tells Flask where `app.py` is, and it looks for `templates/` and `static/` right next to it. Name them anything else and you get `TemplateNotFound`.
+
+### Rendering a Template
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+```
+
+Pass the **filename only** — not `templates/index.html`. Flask already knows the folder.
+
+### Passing Variables
+
+Any keyword argument becomes a variable inside the template.
+
+```python
+@app.route("/hello/<name>")
+def hello(name):
+    return render_template("hello.html", name=name, count=3)
+```
+
+```html
+<h1>Hello, {{ name }}!</h1>
+<p>You have {{ count }} messages.</p>
+```
+
+### The Two Kinds of Brackets
+
+This is the only new syntax, and it is the thing students mix up.
+
+| Syntax | Means | Example |
+|---|---|---|
+| `{{ ... }}` | **print** this value into the page | `{{ user.name }}` |
+| `{% ... %}` | **do** this — for, if, extends, block | `{% for f in fruits %}` |
+| `{# ... #}` | a comment Jinja deletes before sending | `{# TODO #}` |
+
+Curly-curly puts something on the screen. Curly-percent controls what happens.
+
+Two differences from Python worth saying out loud:
+
+1. **Indentation means nothing.** That's why every `{% for %}` needs an `{% endfor %}` and every `{% if %}` needs an `{% endif %}`.
+2. **`{{ }}` only prints.** You cannot assign or define functions in it.
+
+The template language is called **Jinja2**. It ships with Flask — nothing extra to install.
+
+### Python → Jinja, Side by Side
+
+```python
+# Python                           # Template
+f"Hello, {name}!"                  Hello, {{ name }}!
+
+for fruit in fruits:               {% for fruit in fruits %}
+    print(fruit["name"])             {{ fruit.name }}
+                                   {% endfor %}
+
+if user.active:                    {% if user.active %}
+    print("Active")                  <p>Active</p>
+else:                              {% else %}
+    print("Inactive")                <p>Inactive</p>
+                                   {% endif %}
+
+len(fruits)                        {{ fruits|length }}
+name.upper()                       {{ name|upper }}
+round(x, 1)                        {{ x|round(1) }}
+```
+
+In a template, `fruit.name` and `fruit["name"]` both work on a dictionary.
+
+### Loops — The Real Payoff
+
+Hand the template a list; let the template repeat the HTML.
+
+```python
+@app.route("/fruits")
+def fruits():
+    fruit_list = [
+        {"name": "Apple", "color": "Red"},
+        {"name": "Banana", "color": "Yellow"},
+    ]
+    return render_template("fruits.html", fruits=fruit_list)
+```
+
+```html
+<table>
+  <tr><th>#</th><th>Name</th><th>Colour</th></tr>
+  {% for fruit in fruits %}
+    <tr>
+      <td>{{ loop.index }}</td>      <!-- free counter: 1, 2, 3... -->
+      <td>{{ fruit.name }}</td>
+      <td>{{ fruit.color }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">No fruits.</td></tr>
+  {% endfor %}
+</table>
+```
+
+Add a third fruit in `app.py` and the HTML file does not change at all. The `{% else %}` on a for-loop runs when the list is empty.
+
+### Filters
+
+A filter is a function applied with a pipe — `value|filter`.
+
+| Filter | Does |
+|---|---|
+| `{{ name\|upper }}` | uppercase |
+| `{{ name\|lower }}` | lowercase |
+| `{{ name\|title }}` | Title Case |
+| `{{ items\|length }}` | `len(items)` |
+| `{{ price\|round(2) }}` | round to 2 decimals |
+| `{{ x\|default("none") }}` | fallback if undefined |
+
+### `url_for()` — Never Type a URL by Hand
+
+```html
+<a href="/users/1">Alice</a>                                   <!-- fragile -->
+<a href="{{ url_for('user_profile', user_id=1) }}">Alice</a>   <!-- good -->
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+```
+
+`url_for` takes the **function name**, not the path. Rename the route from `/users/<id>` to `/people/<id>` and every link fixes itself.
+
+### Template Inheritance — Write the Skeleton Once
+
+Every page shares a `<head>`, a nav bar, a footer. Write it once in `base.html` with labelled holes:
+
+```html
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}My Site{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav><a href="{{ url_for('home') }}">Home</a></nav>
+  {% block content %}{% endblock %}
+</body>
+</html>
+```
+
+Every other page fills in the holes:
+
+```html
+<!-- templates/fruits.html -->
+{% extends "base.html" %}
+
+{% block title %}Fruits{% endblock %}
+
+{% block content %}
+  <h1>Fruits</h1>
+{% endblock %}
+```
+
+`{% extends %}` must be the first tag in the file. Anything outside a `{% block %}` is ignored. Add a nav link in `base.html` and it appears on every page — the same reasoning as writing a function instead of copy-pasting the body.
+
+### HTML Pages and Status Codes Together
+
+```python
+@app.route("/users/<int:user_id>")
+def user_profile(user_id):
+    user = users.get(user_id)
+
+    if user is None:
+        return render_template("user_not_found.html", user_id=user_id), 404
+
+    return render_template("user.html", user=user)
+```
+
+### Forms — Data Going the Other Way
+
+One route, two methods: `GET` shows the form, `POST` processes it.
+
+```python
+@app.route("/convert", methods=["GET", "POST"])
+def convert():
+    result = None
+
+    if request.method == "POST":
+        celsius = float(request.form["celsius"])
+        result = celsius * 9 / 5 + 32
+
+    return render_template("convert.html", result=result)
+```
+
+```html
+<form method="POST" action="">
+  <input type="number" name="celsius" required>
+  <button type="submit">Convert</button>
+</form>
+
+{% if result is not none %}
+  <p>{{ result|round(1) }}&deg;F</p>
+{% endif %}
+```
+
+The `name="celsius"` attribute is the contract between the HTML and `request.form["celsius"]`. Change one, change the other.
+
+Use `is not none` rather than `if result` — `0` is a valid answer but a falsy value.
+
+### Static Files
+
+Anything in `static/` is served as-is. Templates get rendered; static files do not.
+
+```
+static/style.css   →   http://localhost:5000/static/style.css
+```
+
+Always link to them with `url_for('static', filename='...')`.
+
+### Common Errors
+
+| What you see | What's wrong | Fix |
+|---|---|---|
+| `TemplateNotFound: index.html` | file isn't in `templates/`, or the folder is misnamed | it must be `templates/`, next to `app.py` |
+| Page shows `{{ name }}` literally | you opened the `.html` file directly | visit the URL — the server has to render it |
+| A variable renders as empty | you forgot to pass it to `render_template` | undefined names render as nothing, silently |
+| `Encountered unknown tag 'endfor'` | missing or mismatched `{% endfor %}` / `{% endif %}` | count your open/close tags |
+| CSS has no effect | wrong path, or file isn't in `static/` | use `url_for('static', ...)`; check the URL loads |
+| `400 Bad Request` on submit | `name=` doesn't match `request.form["..."]` | make the two strings identical |
+
+### Key Points
+
+- `render_template("page.html", key=value)` looks in `templates/`, fills in the blanks, returns the finished HTML.
+- `{{ }}` prints, `{% %}` controls, `{# #}` comments.
+- **Do the logic in Python, the layout in the template.** Calculate in the route; display in the HTML.
+- Templates can be combined with status codes: `return render_template(...), 404`.
+- `{% extends %}` plus `{% block %}` stops you copy-pasting the same skeleton into every page.
+- Use `url_for()` for every internal link and every static file.
+
+**Worked example:** `examples/flask_templates/` — all of the above as a runnable app.
+
+---
+
+## 10. A Complete Example — Todo API
 
 Putting it all together — a simple in-memory Todo API using everything above:
 
@@ -532,7 +797,7 @@ curl -X DELETE http://localhost:5000/api/todos/1
 
 ---
 
-## 10. Running and Debugging
+## 11. Running and Debugging
 
 ### Starting the Server
 
@@ -573,6 +838,13 @@ When `debug=True`:
 | Read query params | `request.args.get("key")` | `request.args.get("q", "")` |
 | Read JSON body | `request.json` | `request.json["task"]` |
 | Return JSON | `jsonify(data)` | `return jsonify({"ok": True})` |
+| Return an HTML page | `render_template("f.html", **vars)` | `render_template("hi.html", name="Joel")` |
+| Print in a template | `{{ value }}` | `{{ user.name }}` |
+| Loop in a template | `{% for x in xs %}...{% endfor %}` | `{% for f in fruits %}` |
+| Branch in a template | `{% if c %}...{% endif %}` | `{% if user.active %}` |
+| Build a URL | `url_for("function_name")` | `url_for("user_profile", user_id=1)` |
+| Link a static file | `url_for("static", filename="...")` | `url_for("static", filename="style.css")` |
+| Reuse a layout | `{% extends "base.html" %}` | + `{% block content %}` |
 | Set status code | `return data, code` | `return jsonify(err), 404` |
 | Run server | `app.run(debug=True)` | — |
 
@@ -585,9 +857,11 @@ When `debug=True`:
 | **Functions** → take input, return output | **Route handlers** → take requests, return responses |
 | **Parameters** → `def greet(name)` | **URL variables** → `@app.route("/greet/<name>")` |
 | **Return values** → `return result` | **Responses** → `return "Hello"` or `return jsonify(data)` |
+| **f-strings** → `f"Hello, {name}"` | **Templates** → `Hello, {{ name }}` |
 | **Dictionaries** → `{"key": "value"}` | **JSON** → the data format APIs use |
-| **if/elif/else** → branching logic | **Method checks** → `if request.method == "POST"` |
-| **Lists of dicts** → `[{"name": "Alice"}, ...]` | **API data** → what your endpoints return |
+| **if/elif/else** → branching logic | **Method checks** → `if request.method == "POST"`, and `{% if %}` in templates |
+| **for loops** → repeating work | **`{% for %}`** → repeating HTML for each item |
+| **Lists of dicts** → `[{"name": "Alice"}, ...]` | **API data** → what your endpoints return, or rows in a table |
 | **File I/O** → reading/writing data | **HTTP** → reading requests / writing responses |
 | **Scope** → local vs global variables | **App state** → data stored across requests |
 | **`__name__`** → module name check | **`Flask(__name__)`** → tells Flask where to find resources |

@@ -1,0 +1,21 @@
+{#
+  Two variables this time - the route passed both `number` and `answer`.
+
+  Notice the maths was done in PYTHON (number ** 2) and the template only
+  displays the result. Keep it that way: templates are for layout, not logic.
+#}
+{% extends "base.html" %}
+
+{% block title %}{{ number }} squared{% endblock %}
+
+{% block content %}
+  <h1>{{ number }} squared is {{ answer }}</h1>
+
+  <p>
+    <a href="{{ url_for('square', number=number + 1) }}">
+      Try {{ number + 1 }} &rarr;
+    </a>
+  </p>
+
+  <p><a href="{{ url_for('home') }}">&larr; Back home</a></p>
+{% endblock %}

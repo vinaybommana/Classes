@@ -1,0 +1,70 @@
+{#
+  THE BASE TEMPLATE
+  =================
+  Every page on a site shares the same skeleton: the <head>, the nav bar, the
+  footer. Copying that into six files means fixing bugs six times.
+
+  So we write it ONCE here, and leave holes in it:
+
+      {% block content %}{% endblock %}
+
+  A "block" is a labelled hole. Other templates say "I extend base.html, and
+  here is what goes in the content hole". They don't repeat the skeleton.
+
+  This is template INHERITANCE. Compare it to writing one function and calling
+  it from six places instead of copy-pasting the body six times.
+
+  NOTE THE BRACKETS ON THIS COMMENT - curly-hash, not <!-- -->.
+  They are both comments, but they are NOT the same thing:
+
+    - A curly-hash comment is deleted by Jinja. The browser never sees it,
+      and any tags inside it are safely ignored (like the block above).
+
+    - An HTML comment is passed straight through to the browser, so it shows
+      up in "View Source" - AND any Jinja tag inside it still RUNS, because
+      Jinja processes this file before the browser ever gets it.
+
+  That second point catches everyone once. Use curly-hash for notes to
+  yourself, and HTML comments only for things the browser should receive.
+
+  (One limit: these comments cannot be nested, so this file explains the
+  syntax in words rather than showing the closing bracket mid-comment.)
+#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {# A block can have DEFAULT content. A page that doesn't override
+     the title block just gets "Flask Templates Demo". #}
+  <title>{% block title %}Flask Templates Demo{% endblock %}</title>
+
+  {# url_for('static', filename='style.css') builds the URL to
+     static/style.css. Always use url_for instead of typing "/static/style.css"
+     by hand - if the app ever moves to a sub-path, url_for still works. #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <nav>
+    {# url_for('home') means "the URL of the function called home".
+       Note: the FUNCTION name, not the path. Change @app.route("/") to
+       @app.route("/start") and every one of these links updates itself. #}
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('fruits') }}">Fruits</a>
+    <a href="{{ url_for('user_list') }}">Users</a>
+    <a href="{{ url_for('convert') }}">Converter</a>
+  </nav>
+
+  <main>
+    {# The hole. Each page fills this in. #}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>Built with Flask &middot; Python Classes</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+{#
+  THE REGISTER FORM
+  =================
+  This is the form from the cheatsheet, now living in templates/ and wired to
+  a real route. Compare the two — the HTML is almost unchanged. Only three
+  Jinja bits have been added, marked below.
+#}
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+  {#
+    JINJA BIT 1 — the error message.
+
+    app.py renders this page with  error="..."  when a check fails, and
+    without it on a normal GET. A variable that was never passed is simply
+    empty, so this {% if %} shows the box only when there is something to say.
+
+    That is the whole pattern for form errors: pass a message, test for it.
+  #}
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  {#
+    JINJA BIT 2 — url_for on the action.
+
+    Could we write action="/register"? Yes, and it would work. But url_for
+    takes the FUNCTION name, so renaming the route later fixes this link
+    automatically. Same reasoning as the nav links.
+
+    method="POST" because registering CHANGES something. Never GET.
+  #}
+  <form class="card" action="{{ url_for('register') }}" method="POST">
+    <h2>Create an account</h2>
+
+    <label for="username">Username</label>
+    {#
+      JINJA BIT 3 — value="{{ username }}" keeps what they typed.
+
+      Without it, a rejected form comes back blank and they retype everything.
+      On a GET, `username` was never passed, so this renders as value="" —
+      an empty box, which is exactly right.
+
+      Note we do NOT do this for the password field. Browsers mostly ignore a
+      pre-filled password anyway, and re-sending it in the HTML is a bad habit.
+    #}
+    <input id="username" name="username" type="text"
+           value="{{ username }}" required autofocus>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password"
+           required minlength="4">
+
+    <button type="submit">Create account</button>
+
+    <p class="small">
+      Already have an account?
+      <a href="{{ url_for('login') }}">Log in</a>
+    </p>
+  </form>
+
+  {#
+    Remember: `required` and `minlength` are browser conveniences. app.py
+    checks both again, because anyone can delete these attributes in
+    developer tools or POST here without a browser at all.
+  #}
+
+{% endblock %}

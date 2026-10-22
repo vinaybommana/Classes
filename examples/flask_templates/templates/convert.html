@@ -1,0 +1,41 @@
+{#
+  A FORM - how the browser sends data back to your Python.
+
+  Three things make it work:
+
+    method="POST"   send the values in the request body (not the URL)
+    action=""       send it to the SAME url we're already on, so one route
+                    handles both showing the form and processing it
+    name="celsius"  the key. In Python: request.form["celsius"]
+
+  The name attribute is the contract between the HTML and the Python. Change
+  one, you must change the other.
+#}
+{% extends "base.html" %}
+
+{% block title %}Temperature converter{% endblock %}
+
+{% block content %}
+  <h1>Celsius to Fahrenheit</h1>
+
+  <form method="POST" action="">
+    <label for="celsius">Celsius:</label>
+    <input type="number" step="any" id="celsius" name="celsius" required>
+    <button type="submit">Convert</button>
+  </form>
+
+  {#
+    On a GET the route passes result=None, so the block below is skipped and
+    the page shows just the empty form. After a POST, result holds a number
+    and the answer appears. One template, two states.
+
+    `is not none` rather than `if result` on purpose: 0 degrees Celsius is a
+    perfectly good answer, but `if result` would treat 0.0 as falsy and hide
+    it. Try converting 0 and then -17.78 to see the difference.
+  #}
+  {% if result is not none %}
+    <p class="ok">That's <strong>{{ result|round(1) }}&deg;F</strong></p>
+  {% endif %}
+
+  <p><a href="{{ url_for('home') }}">&larr; Back home</a></p>
+{% endblock %}

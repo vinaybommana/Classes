@@ -1,0 +1,176 @@
+/* ============================================================
+   static/style.css
+   ============================================================
+   The stylesheet from Exercises/html_forms_css_cheatsheet.md, section 12,
+   with a nav bar and message boxes added.
+
+   Nothing here is decorative. Every rule fixes a specific browser default
+   that looks bad. Read the comments, then change a value and hit refresh.
+
+   Remember: files in static/ are served AS-IS. Flask renders templates;
+   it hands static files over unchanged.
+   ============================================================ */
+
+
+/* box-sizing on everything.
+   Without this, `width: 100%` means "the CONTENT is 100% wide" and padding
+   and border get added on top — so inputs overflow their card. With it,
+   100% means the whole box including padding and border. Set it once,
+   globally, and stop thinking about it. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;          /* the default 1.2 is cramped        */
+  max-width: 30rem;          /* stop lines running edge to edge   */
+  margin: 0 auto;            /* auto on the sides = centred       */
+  padding: 2rem 1rem;        /* breathing room on phones          */
+  color: #222;               /* near-black is softer than #000    */
+}
+
+
+/* ---------- nav ---------- */
+
+nav {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.75rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #0b5fff;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.nav-right {
+  float: right;
+  color: #666;
+}
+
+
+/* ---------- the form card ---------- */
+
+/* `.card` is a CLASS — a name we invented and put on both forms. One rule,
+   styling every form that opts in. Tag selectors would style all forms
+   whether we wanted it or not. */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.card h2 {
+  margin-top: 0;             /* headings ship with a top margin we don't
+                                want here — it would dent the card */
+}
+
+/* display: block is the important one.
+   Labels and inputs are INLINE by default, so they sit side by side like
+   words in a sentence. block makes each take a full line — which is what a
+   stacked form is. */
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;           /* below 1rem, iPhones zoom in on focus */
+}
+
+/* A pseudo-class — a STATE, not a tag. This applies only while the cursor
+   is in the box, so the user can see where they are typing. */
+input:focus {
+  outline: 2px solid #0b5fff;
+  border-color: #0b5fff;
+}
+
+button {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.6rem;
+  font-size: 1rem;
+  background: #0b5fff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;           /* hand cursor — it looks clickable */
+}
+
+button:hover {
+  background: #0a4fd6;       /* feedback on mouse-over */
+}
+
+
+/* ---------- messages ---------- */
+
+/* The coloured left border is a cheap, very readable way to mark a message
+   box. padding pushes the text off the border; margin pushes the whole box
+   away from the form below it. */
+.error,
+.success {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+
+.error {
+  background: #fde8e8;
+  border-left: 4px solid #b00020;
+  color: #7a0016;
+}
+
+.success {
+  background: #e7f6ec;
+  border-left: 4px solid #0a7a3d;
+  color: #06502a;
+}
+
+
+/* ---------- odds and ends ---------- */
+
+.small {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0;
+}
+
+code {
+  background: #f3f3f3;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* <pre> already preserves newlines; this just makes the dump look like a
+   file rather than part of the page. */
+.file-dump {
+  background: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;          /* long lines scroll instead of breaking the page */
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  font-size: 0.85rem;
+  color: #666;
+}

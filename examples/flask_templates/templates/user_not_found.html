@@ -1,0 +1,19 @@
+{#
+  A template can be the body of an ERROR response too.
+
+  The route returned:   render_template("user_not_found.html", ...), 404
+
+  So the browser gets a nice page AND the correct 404 status code. Check it
+  with:  curl -i http://localhost:5000/users/99
+#}
+{% extends "base.html" %}
+
+{% block title %}User not found{% endblock %}
+
+{% block content %}
+  <h1>404 — No such user</h1>
+
+  <p class="warn">There is no user with id <strong>{{ user_id }}</strong>.</p>
+
+  <p><a href="{{ url_for('user_list') }}">&larr; See who does exist</a></p>
+{% endblock %}
