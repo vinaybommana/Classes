@@ -356,5 +356,6 @@ The storage layer is two functions and a text file. Everything in the
 fast lookups by key, many writers at once, real columns, and deleting a row
 without rewriting the world.
 
-Tomorrow: the same app, with `load_users()` and `save_user()` talking to
-SQLite instead. **Nothing else in this folder has to change.**
+Next: `Exercises/databases_sqlite_cheatsheet.md` — what a database is, the SQL
+you need, and `sqlite3` from Python. It ends by rewriting `load_users()` and
+`save_user()` against SQLite. **Nothing else in this folder has to change.**
